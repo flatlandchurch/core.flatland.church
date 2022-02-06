@@ -9,8 +9,17 @@ import None from './questions/None';
 import Card from './components/Card';
 import Label from './components/Label';
 
+type Value = {
+  attributes: {
+    form_field_id: string;
+    value: unknown;
+  };
+  type: 'FormSubmissionValue';
+};
+
 type Props = {
   option: 'leader' | 'mentor' | 'member' | 'none';
+  onInclude: (values: Value[]) => void;
 };
 
 const Heading = styled(Label)`
@@ -48,6 +57,14 @@ const options = [
   },
 ];
 
+const createValue = (value: string, id: string): Value => ({
+  attributes: {
+    form_field_id: id,
+    value,
+  },
+  type: 'FormSubmissionValue',
+});
+
 const Questions = (props: Props) => {
   const [leader, setLeader] = useState('');
   const [mentor, setMentor] = useState('');
@@ -60,7 +77,40 @@ const Questions = (props: Props) => {
     setMentor('');
     setMember({});
     setNone({});
+    setTeams({});
   }, [props.option]);
+
+  useEffect(() => {
+    switch (props.option) {
+      case 'leader': {
+        props.onInclude([createValue(leader, '2466087')]);
+        break;
+      }
+      case 'mentor': {
+        props.onInclude([createValue(mentor, '2466088')]);
+        break;
+      }
+      case 'member': {
+        props.onInclude(
+          Object.keys(mentor)
+            .filter((k) => mentor[k])
+            .map((k) => createValue(k, '2466090')),
+        );
+        break;
+      }
+      case 'none': {
+        props.onInclude([
+          ...Object.keys(none)
+            .filter((k) => none[k])
+            .map((k) => createValue(k, '2466079')),
+          ...Object.keys(teams)
+            .filter((k) => teams[k])
+            .map((k) => createValue(k, '2466080')),
+        ]);
+        break;
+      }
+    }
+  }, [leader, mentor, member, none, teams]);
 
   return (
     <div>

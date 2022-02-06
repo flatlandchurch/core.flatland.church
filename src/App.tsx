@@ -102,56 +102,138 @@ const options: Option[] = [
   },
 ];
 
+const INVOLVEMENT_MAP = {
+  leader: '2690714',
+  mentor: '2690715',
+  member: '2690716',
+  none: '2690717',
+};
+
 const App = () => {
   const [involvement, setInvolvement] = useState<OptionValue | null>(null);
+  const [includes, setIncludes] = useState([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [email, setEmail] = useState('');
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const token = await fetch('/.netlify/functions/form', {
+
+    const payload = {
+      data: {
+        type: 'FormSubmission',
+        attributes: {
+          email_address: email,
+          person_attributes: {
+            first_name: firstName,
+            last_name: lastName,
+            email_attributes: [
+              {
+                address: email,
+              },
+            ],
+          },
+        },
+      },
+      included: [
+        {
+          type: 'FormSubmissionValue',
+          attributes: {
+            form_field_id: '2466083',
+            value: INVOLVEMENT_MAP[involvement],
+          },
+        },
+        ...includes,
+      ],
+    };
+
+    setSending(true);
+    await fetch('/.netlify/functions/form', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({}),
+      body: JSON.stringify(payload),
     }).then((d) => d.json());
-    console.log(token);
+    setSending(false);
+    setSent(true);
+  };
+
+  const handleIncludes = (includes) => {
+    if (includes.length) {
+      setIncludes(includes.filter((k) => !!k.attributes.value));
+    }
   };
 
   return (
     <>
       <Header />
       <Form onSubmit={onSubmit}>
-        <Title>Core Night Response</Title>
-        <CardContainer as="div" style={{ marginBottom: 24 }}>
-          <Row>
-            <Input autoComplete="given-name" label="First Name" value="" onChange={() => {}} />
-            <Input autoComplete="family-name" label="Last Name" value="" onChange={() => {}} />
-          </Row>
-          <Input
-            autoComplete="email"
-            type="email"
-            label="Email Address"
-            value=""
-            onChange={() => {}}
-          />
-        </CardContainer>
-        <Label as="p">What is your current involvement at Flatland?</Label>
-        <Small>Check only the first box that applies.</Small>
-        {options.map((opt) => (
-          <Card
-            active={involvement === opt.value}
-            onClick={() => setInvolvement(opt.value)}
-            key={opt.value}
-          >
-            <span className="material-icons-outlined">
-              {involvement === opt.value ? 'radio_button_checked' : 'radio_button_unchecked'}
-            </span>
-            <span>{opt.label}</span>
-          </Card>
-        ))}
-        {involvement && <Rule />}
-        <div>{involvement && <Questions option={involvement} />}</div>
-        {involvement && <Button>Submit</Button>}
+        {sent ? (
+          <CardContainer as="div">
+            <h1>
+              <span role="img" aria-label="Peace sign">
+                ✌️
+              </span>{' '}
+              Thanks!
+            </h1>
+            <p style={{ fontSize: 18 }}>
+              We love having you here and can't wait to see how you move closer to the center over
+              this next quarter.
+            </p>
+          </CardContainer>
+        ) : (
+          <>
+            <Title>Core Night Response</Title>
+            <CardContainer as="div" style={{ marginBottom: 24 }}>
+              <Row>
+                <Input
+                  required
+                  autoComplete="given-name"
+                  label="First Name"
+                  value={firstName}
+                  onChange={setFirstName}
+                />
+                <Input
+                  required
+                  autoComplete="family-name"
+                  label="Last Name"
+                  value={lastName}
+                  onChange={setLastName}
+                />
+              </Row>
+              <Input
+                required
+                autoComplete="email"
+                type="email"
+                label="Email Address"
+                value={email}
+                onChange={setEmail}
+              />
+            </CardContainer>
+            <Label as="p">What is your current involvement at Flatland?</Label>
+            <Small>Check only the first box that applies.</Small>
+            {options.map((opt) => (
+              <Card
+                active={involvement === opt.value}
+                onClick={() => setInvolvement(opt.value)}
+                key={opt.value}
+              >
+                <span className="material-icons-outlined">
+                  {involvement === opt.value ? 'radio_button_checked' : 'radio_button_unchecked'}
+                </span>
+                <span>{opt.label}</span>
+              </Card>
+            ))}
+            {involvement && <Rule />}
+            <div>
+              {involvement && <Questions option={involvement} onInclude={handleIncludes} />}
+            </div>
+            {involvement && <Button disabled={sending}>{sending ? 'Sending...' : 'Submit'}</Button>}
+          </>
+        )}
       </Form>
     </>
   );
