@@ -129,9 +129,10 @@ const App = () => {
           person_attributes: {
             first_name: firstName,
             last_name: lastName,
-            email_attributes: [
+            emails_attributes: [
               {
                 address: email,
+                location: 'Home',
               },
             ],
           },
