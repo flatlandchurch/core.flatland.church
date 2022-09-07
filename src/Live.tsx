@@ -108,9 +108,15 @@ const Live = () => {
   }, [ideas]);
 
   const columns = [[], [], [], [], []];
-  ideas.forEach((idea, index) => {
-    columns[index % 5].push(idea);
-  });
+  ideas
+    // sort by createdAt date
+    .sort((a, b) => {
+      // @ts-ignore
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    })
+    .forEach((idea, index) => {
+      columns[index % 5].push(idea);
+    });
 
   return (
     <>
