@@ -4,21 +4,21 @@ import { v4 as uuidv4 } from 'uuid';
 // @ts-ignore
 import catchify from 'catchify';
 
+admin.initializeApp({
+  credential: admin.credential.cert({
+    projectId: process.env.FIREBASE_PROJECT_ID,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+  }),
+  databaseURL: 'https://move-to-the-center.firebaseio.com',
+});
+
 const handler = async (event) => {
   const [err, data] = await catchify(
     got('https://flatland.churchcenter.com/sessions/tokens', {
       method: 'POST',
     }).json(),
   );
-
-  admin.initializeApp({
-    credential: admin.credential.cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      privateKey: process.env.FIREBASE_PRIVATE_KEY,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-    }),
-    databaseURL: 'https://move-to-the-center.firebaseio.com',
-  });
 
   if (err) {
     return Promise.resolve({

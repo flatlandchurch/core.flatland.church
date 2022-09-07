@@ -24,10 +24,15 @@ const createPayload = (email, firstName, lastName, formValue, includes = [], ide
       },
     },
     ...includes,
-    ...ideas.map((attributes) => ({
-      type: 'Idea',
-      attributes,
-    })),
+    ...ideas
+      .filter((i) => i)
+      .map((attributes) => ({
+        type: 'Idea',
+        attributes: {
+          ...attributes,
+          createdAt: new Date().toISOString(),
+        },
+      })),
   ],
 });
 
