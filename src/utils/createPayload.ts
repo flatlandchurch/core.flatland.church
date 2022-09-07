@@ -1,4 +1,4 @@
-const createPayload = (email, firstName, lastName, formValue, includes = []) => ({
+const createPayload = (email, firstName, lastName, formValue, includes = [], ideas = []) => ({
   data: {
     type: 'FormSubmission',
     attributes: {
@@ -24,6 +24,12 @@ const createPayload = (email, firstName, lastName, formValue, includes = []) => 
       },
     },
     ...includes,
+    ...ideas.map((idea) => ({
+      type: 'Idea',
+      attributes: {
+        content: idea,
+      },
+    })),
   ],
 });
 

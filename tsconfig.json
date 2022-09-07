@@ -5,6 +5,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "moduleResolution": "Node"
   }
 }

@@ -15,6 +15,17 @@ const handler = async (event) => {
     });
   }
 
+  const body = JSON.parse(event.body);
+  const { included, ...rest } = body;
+
+  const ideas = included.filter((item) => item.type === 'Idea');
+  // POST to Fauna
+
+  const payload = {
+    ...rest,
+    included: included.filter((item) => item.type !== 'Idea'),
+  };
+
   const [submissionErr] = await catchify(
     got(`https://api.churchcenter.com/people/v2/forms/345540/form_submissions`, {
       method: 'POST',
@@ -22,7 +33,7 @@ const handler = async (event) => {
         'Content-Type': 'application/json',
         Authorization: `OrganizationToken ${data.data.attributes.token}`,
       },
-      body: event.body,
+      body: JSON.stringify(payload),
     }).json(),
   );
 

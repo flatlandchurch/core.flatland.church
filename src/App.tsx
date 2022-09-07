@@ -6,7 +6,6 @@ import Input from './components/Input';
 
 import CardAnswer from './CardAnswer';
 import Questions from './Questions';
-// @ts-ignore
 import { Button, Form, Header, CardContainer, Row, Rule, Small, Title } from './styled';
 
 import options, { OptionValue } from './data/options';
@@ -27,6 +26,7 @@ const App = () => {
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [ideas, setIdeas] = useState<string[]>([]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -37,6 +37,7 @@ const App = () => {
       lastName,
       INVOLVEMENT_MAP[involvement],
       includes,
+      ideas,
     );
 
     setSending(true);
@@ -125,9 +126,18 @@ const App = () => {
             <CardAnswer
               label="What are people talking about, excited about, and stressing about?"
               limit={2}
+              onAnswer={setIdeas}
             />
-            <CardAnswer label="Why are people seeking and avoiding God and the church?" limit={2} />
-            <CardAnswer label="What do you want to know more about God and the Bible?" limit={2} />
+            <CardAnswer
+              label="Why are people seeking and avoiding God and the church?"
+              limit={2}
+              onAnswer={setIdeas}
+            />
+            <CardAnswer
+              label="What do you want to know more about God and the Bible?"
+              limit={2}
+              onAnswer={setIdeas}
+            />
             {involvement && <Button disabled={sending}>{sending ? 'Sending...' : 'Submit'}</Button>}
           </>
         )}
