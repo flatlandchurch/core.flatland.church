@@ -3,11 +3,11 @@ import admin from 'firebase-admin';
 import { v4 as uuidv4 } from 'uuid';
 // @ts-ignore
 import catchify from 'catchify';
-
+console.log(process.env.FIREBASE_PRIVATE_KEY);
 admin.initializeApp({
   credential: admin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
-    privateKey: process.env.FIREBASE_PRIVATE_KEY,
+    privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
     clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
   }),
   databaseURL: 'https://move-to-the-center.firebaseio.com',
