@@ -1,106 +1,16 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 
 import Card from './components/Card';
-import Questions from './Questions';
 import Label from './components/Label';
 import Input from './components/Input';
 
-const Form = styled.form`
-  width: 640px;
-  max-width: 95%;
-  margin: -124px auto 12px;
-`;
+import CardAnswer from './CardAnswer';
+import Questions from './Questions';
+// @ts-ignore
+import { Button, Form, Header, CardContainer, Row, Rule, Small, Title } from './styled';
 
-const Header = styled.header`
-  width: 100%;
-  background: #6a27b8;
-  background: linear-gradient(
-    335deg,
-    hsl(268deg 65% 44%) 0%,
-    hsl(283deg 74% 39%) 11%,
-    hsl(296deg 95% 33%) 22%,
-    hsl(306deg 100% 33%) 33%,
-    hsl(314deg 100% 36%) 44%,
-    hsl(320deg 100% 38%) 56%,
-    hsl(325deg 100% 39%) 67%,
-    hsl(329deg 100% 40%) 78%,
-    hsl(335deg 92% 43%) 89%,
-    hsl(343deg 74% 48%) 100%
-  );
-  padding: 120px 24px;
-  display: block;
-`;
-
-const CardContainer = styled(Card)`
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-gap: 8px;
-`;
-
-const Row = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-gap: 8px;
-`;
-
-const Rule = styled.div`
-  height: 1px;
-  display: block;
-  width: 100%;
-  background: #d0d4d7;
-  margin: 24px 0;
-`;
-
-const Small = styled.p`
-  margin-bottom: 12px;
-  font-size: 12px;
-  color: #68737d;
-`;
-
-const Button = styled.button`
-  background: #a8458c;
-  color: #fff;
-  border-radius: 50px;
-  padding: 12px 68px;
-  margin: 24px auto;
-  display: block;
-  appearance: none;
-  border: 0;
-  font-size: inherit;
-  font-weight: 600;
-  cursor: pointer;
-`;
-
-const Title = styled.h1`
-  color: #fff;
-  margin-bottom: 24px;
-`;
-
-type OptionValue = 'leader' | 'mentor' | 'member' | 'none';
-type Option = {
-  label: string;
-  value: OptionValue;
-};
-
-const options: Option[] = [
-  {
-    label: 'I am a Life Group or Team Leader',
-    value: 'leader',
-  },
-  {
-    label: 'I am a Mentor or Coach',
-    value: 'mentor',
-  },
-  {
-    label: 'I am in a Life Group or on a Ministry Team',
-    value: 'member',
-  },
-  {
-    label: 'I am not currently involved beyond Sunday gatherings',
-    value: 'none',
-  },
-];
+import options, { OptionValue } from './data/options';
+import createPayload from './utils/createPayload';
 
 const INVOLVEMENT_MAP = {
   leader: '2690714',
@@ -121,34 +31,13 @@ const App = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const payload = {
-      data: {
-        type: 'FormSubmission',
-        attributes: {
-          email_address: email,
-          person_attributes: {
-            first_name: firstName,
-            last_name: lastName,
-            emails_attributes: [
-              {
-                address: email,
-                location: 'Home',
-              },
-            ],
-          },
-        },
-      },
-      included: [
-        {
-          type: 'FormSubmissionValue',
-          attributes: {
-            form_field_id: '2466083',
-            value: INVOLVEMENT_MAP[involvement],
-          },
-        },
-        ...includes,
-      ],
-    };
+    const payload = createPayload(
+      email,
+      firstName,
+      lastName,
+      INVOLVEMENT_MAP[involvement],
+      includes,
+    );
 
     setSending(true);
     await fetch('/.netlify/functions/form', {
@@ -181,13 +70,13 @@ const App = () => {
               Thanks!
             </h1>
             <p style={{ fontSize: 18 }}>
-              We love having you here and can't wait to see how you move closer to the center over
-              this next quarter.
+              Thank you for seeking God with us. We're excited to see how the Holy Spirit moves us
+              to the center together in this next year.
             </p>
           </CardContainer>
         ) : (
           <>
-            <Title>Core Night Response</Title>
+            <Title>Core Team Prayer Night Response</Title>
             <CardContainer as="div" style={{ marginBottom: 24 }}>
               <Row>
                 <Input
@@ -232,6 +121,13 @@ const App = () => {
             <div>
               {involvement && <Questions option={involvement} onInclude={handleIncludes} />}
             </div>
+            <Rule />
+            <CardAnswer
+              label="What are people talking about, excited about, and stressing about?"
+              limit={2}
+            />
+            <CardAnswer label="Why are people seeking and avoiding God and the church?" limit={2} />
+            <CardAnswer label="What do you want to know more about God and the Bible?" limit={2} />
             {involvement && <Button disabled={sending}>{sending ? 'Sending...' : 'Submit'}</Button>}
           </>
         )}
