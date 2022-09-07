@@ -4,7 +4,7 @@ import Card from './components/Card';
 import Label from './components/Label';
 import Input from './components/Input';
 
-import CardAnswer from './CardAnswer';
+import CardAnswer, { Answer } from './CardAnswer';
 import Questions from './Questions';
 import { Button, Form, Header, CardContainer, Row, Rule, Small, Title } from './styled';
 
@@ -26,7 +26,7 @@ const App = () => {
   const [email, setEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
-  const [ideas, setIdeas] = useState<string[]>([]);
+  const [ideas, setIdeas] = useState<Answer[]>([]);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -57,6 +57,13 @@ const App = () => {
       setIncludes(includes.filter((k) => !!k.attributes.value));
     }
   };
+
+  const handleIdea = (answer, type, idx) =>
+    setIdeas((s) => {
+      const newIdeas = [...s];
+      newIdeas[idx] = { content: answer, type };
+      return newIdeas;
+    });
 
   return (
     <>
@@ -126,17 +133,26 @@ const App = () => {
             <CardAnswer
               label="What are people talking about, excited about, and stressing about?"
               limit={2}
-              onAnswer={setIdeas}
+              answers={ideas}
+              onAnswer={handleIdea}
+              idx={0}
+              type="talking"
             />
             <CardAnswer
               label="Why are people seeking and avoiding God and the church?"
               limit={2}
-              onAnswer={setIdeas}
+              answers={ideas}
+              onAnswer={handleIdea}
+              idx={2}
+              type="seeking"
             />
             <CardAnswer
               label="What do you want to know more about God and the Bible?"
               limit={2}
-              onAnswer={setIdeas}
+              answers={ideas}
+              onAnswer={handleIdea}
+              idx={4}
+              type="knowing"
             />
             {involvement && <Button disabled={sending}>{sending ? 'Sending...' : 'Submit'}</Button>}
           </>

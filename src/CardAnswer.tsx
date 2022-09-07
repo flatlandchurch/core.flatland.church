@@ -5,10 +5,16 @@ import Label from './components/Label';
 import Card from './components/Card';
 import { Button, Small } from './styled';
 
+export type AnswerType = 'talking' | 'seeking' | 'knowing';
+export type Answer = { type: AnswerType; content: string };
+
 type Props = {
   label: string;
   limit: number;
-  onAnswer: (answer: string[]) => void;
+  onAnswer: (answer: string, type: string, idx: number) => void;
+  type: AnswerType;
+  answers: Answer[];
+  idx: number;
 };
 
 const Wrapper = styled.div`
@@ -67,13 +73,12 @@ const Textarea = styled.textarea`
   }
 `;
 
-const CardAnswer = ({ label, limit, onAnswer }: Props) => {
+const CardAnswer = ({ label, limit, answers, idx, onAnswer, type }: Props) => {
   const [textBoxCount, setTextBoxCount] = useState(0);
-  const [answers, setAnswers] = useState<string[]>(Array(limit).fill(''));
 
-  useEffect(() => {
-    onAnswer(answers);
-  }, [answers]);
+  const handleAnswers = (i) => (e) => {
+    onAnswer(e.target.value, type, i);
+  };
 
   return (
     <Wrapper>
@@ -88,17 +93,11 @@ const CardAnswer = ({ label, limit, onAnswer }: Props) => {
             <Textarea
               rows={7}
               maxLength={240}
-              value={answers[i]}
-              onChange={(e) =>
-                setAnswers((a) => {
-                  const newAnswers = [...a];
-                  newAnswers[i] = e.target.value;
-                  return newAnswers;
-                })
-              }
+              value={answers[idx + i]?.content || ''}
+              onChange={handleAnswers(idx + i)}
             />
-            <CharacterCounter percentage={answers[i].length / 240}>
-              {answers[i].length}/240
+            <CharacterCounter percentage={(answers[idx + i]?.content?.length || 0) / 240}>
+              {answers[idx + i]?.content?.length || 0}/240
             </CharacterCounter>
           </TextareaWrapper>
         </Card>

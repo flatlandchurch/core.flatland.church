@@ -1,4 +1,6 @@
 import got from 'got';
+import admin from 'firebase-admin';
+import { v4 as uuidv4 } from 'uuid';
 // @ts-ignore
 import catchify from 'catchify';
 
@@ -8,6 +10,15 @@ const handler = async (event) => {
       method: 'POST',
     }).json(),
   );
+
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    }),
+    databaseURL: 'https://move-to-the-center.firebaseio.com',
+  });
 
   if (err) {
     return Promise.resolve({
@@ -19,7 +30,9 @@ const handler = async (event) => {
   const { included, ...rest } = body;
 
   const ideas = included.filter((item) => item.type === 'Idea');
-  // POST to Fauna
+  const db = admin.database();
+  const ref = db.ref('ideas');
+  await Promise.all(ideas.map((idea) => ref.child(uuidv4()).set(idea.attributes)));
 
   const payload = {
     ...rest,

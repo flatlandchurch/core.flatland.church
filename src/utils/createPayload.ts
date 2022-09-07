@@ -24,11 +24,9 @@ const createPayload = (email, firstName, lastName, formValue, includes = [], ide
       },
     },
     ...includes,
-    ...ideas.map((idea) => ({
+    ...ideas.map((attributes) => ({
       type: 'Idea',
-      attributes: {
-        content: idea,
-      },
+      attributes,
     })),
   ],
 });
