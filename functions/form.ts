@@ -32,7 +32,8 @@ const handler = async (event) => {
   const ideas = included.filter((item) => item.type === 'Idea');
   const db = admin.database();
   const ref = db.ref('ideas');
-  await Promise.all(ideas.map((idea) => ref.child(uuidv4()).set(idea.attributes)));
+  // Disallow adding ideas since the meeting has closed
+  // await Promise.all(ideas.map((idea) => ref.child(uuidv4()).set(idea.attributes)));
 
   const payload = {
     ...rest,
