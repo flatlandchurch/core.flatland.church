@@ -23,7 +23,7 @@ const Card = styled.div`
     0.7px 1.6px 1.8px -2px hsl(var(--shadow-color) / 0.42),
     1.8px 4px 4.6px -3px hsl(var(--shadow-color) / 0.37);
   border: 0;
-  font-size: 24px;
+  font-size: 48px;
   font-weight: inherit;
   text-align: left;
   padding: 16px;
@@ -68,7 +68,8 @@ const Column = styled.div`
 `;
 
 const Legend = styled.div`
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, max-content));
   align-items: center;
   justify-content: center;
   position: fixed;
@@ -76,15 +77,16 @@ const Legend = styled.div`
   left: 0;
   width: 100%;
   padding: 18px 0 24px;
-  gap: 24px;
+  grid-gap: 24px;
   border-top: 1px solid #000;
   background: #fff;
+  font-size: 24px;
 `;
 
 const LegendItem = styled.div`
   display: grid;
   grid-template-columns: repeat(2, minmax(0, max-content));
-  grid-gap: 8px;
+  grid-gap: 24px;
 `;
 
 const Live = () => {
