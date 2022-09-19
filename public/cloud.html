@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Word Cloud</title>
+    </head>
+    <body>
+        <svg id="demo2" width="1200" height="900"></svg>
+        <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.js"></script>
+        <script>
+            (async () => {
+                const fill = d3.scaleOrdinal(d3.schemeCategory10);
+
+                const rawData = await fetch('/data.csv').then(res => res.text());
+                const data = rawData
+                    .toLowerCase()
+                    .split('\n')
+                    .map((s) => s.trim())
+                    .reduce((acc, word) => {
+                        const inSet = acc.findIndex((w) => w.text === word);
+                        if (inSet > -1) {
+                            acc[inSet].value += 1;
+                            return acc
+                        }
+
+                        acc.push({
+                            text: word,
+                            value: 1
+                        });
+                        return acc
+                    }, [])
+
+                const layout = d3.layout.cloud()
+                    .size([1200, 900])
+                    .words(data)
+                    .font("Impact")
+                    .fontSize((d) => d.value * 12)
+                    .padding(5)
+                    .rotate(function() { return ~~(Math.random() * 2) * 90; })
+                    .on("end", draw);
+
+                layout.start();
+
+                function draw(words) {
+                    d3.select("#demo2")
+                        .append("g")
+                        .attr("transform", "translate(" + layout.size()[0] / 2 + "," + layout.size()[1] / 2 + ")")
+                        .selectAll("text")
+                        .data(words)
+                        .enter()
+                        .append("text")
+                        .text((d) => d.text)
+                        .style("font-size", (d) => d.size + "px")
+                        .style("font-family", (d) => d.font)
+                        .style("fill", (d, i) => fill(i))
+                        .attr("text-anchor", "middle")
+                        .attr("transform", (d) => "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")");
+                }
+            })()
+        </script>
+    </body>
+</html>
